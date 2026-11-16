@@ -36,6 +36,7 @@ $('quizMode').onchange=()=>renderQuiz(true);
 $('confidence').oninput=()=>$('confidenceVal').textContent=$('confidence').value;$('reveal').onclick=()=>{if(!$('answer').value.trim()){alert('まず記憶だけで答えてみよう');return}$('original').textContent=currentQuestion.sentence; $('expectedAnswer').textContent=currentQuestion.original?('空欄の答え：'+currentQuestion.original):'その日の日記：';$('result').hidden=false;$('reveal').hidden=true};function grade(correct){if($('result').hidden)return;state.results.push({date:current,answeredAt:new Date().toISOString(),answer:$('answer').value,question:currentQuestion?.question||'',expected:currentQuestion?.original||'',confidence:Number($('confidence').value),correct});persist();renderQuiz(true)}$('correct').onclick=()=>grade(true);$('wrong').onclick=()=>grade(false);$('newQuestion').onclick=()=>renderQuiz(true);
 function renderHistory(){const d=$('entries');d.replaceChildren();const list=Object.keys(state.entries).sort().reverse();if(!list.length){d.textContent='まだ記録がありません。';return}list.forEach(k=>{const div=document.createElement('div');div.className='entry';const strong=document.createElement('strong');strong.textContent=k;const pre=document.createElement('pre');pre.textContent=state.entries[k];const btn=document.createElement('button');btn.className='secondary danger';btn.textContent='この日を削除';btn.onclick=()=>{if(confirm(`${k} の日記を削除しますか？`)){delete state.entries[k];persist();renderHistory()}};div.append(strong,pre,btn);d.append(div)})};$('export').onclick=()=>{const blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`omoide-backup-${today}.json`;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),3000)};$('import').onchange=async e=>{const file=e.target.files[0];if(!file)return;try{let x=JSON.parse(await file.text());if(!x||typeof x.entries!=='object'||Array.isArray(x.entries)||!Array.isArray(x.results))throw Error('形式が違います');if(confirm('現在のデータをバックアップの内容で置き換えますか？')){state=x;persist();renderHistory();$('importStatus').textContent='読み込みました'}}catch{$('importStatus').textContent='読み込めないファイルです'}e.target.value=''};
 })();
+</script>
 <script>
 (() => {
   const date = document.getElementById('date');
@@ -91,4 +92,6 @@ function renderHistory(){const d=$('entries');d.replaceChildren();const list=Obj
     restoreDraft();
   } catch {}
 })();
-</script></body></html>
+</script>
+</body>
+</html>
